@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AirWing Airlines - Login</title>
+<style>
+/* Reset & font */
+body {
+    margin: 0;
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: linear-gradient(135deg,#cce0ff,#f0f6ff);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Login container */
+.login-container {
+    background: #fff;
+    padding: 40px 30px;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+    text-align: center;
+    width: 350px;
+    transition: transform 0.3s;
+}
+.login-container:hover {
+    transform: translateY(-5px);
+}
+
+/* Logo */
+.logo {
+    width: 80px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+}
+
+/* Heading */
+.login-container h2 {
+    color: #1d70ff;
+    margin-bottom: 25px;
+}
+
+/* Input fields */
+.login-container input {
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 15px;
+    border-radius: 12px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    transition: border 0.3s, box-shadow 0.3s;
+}
+.login-container input:focus {
+    border: 1px solid #1d70ff;
+    box-shadow: 0 0 10px rgba(29,112,255,0.3);
+    outline: none;
+}
+
+/* Button */
+#loginBtn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    background: #1d70ff;
+    color: white;
+    font-size: 17px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+}
+#loginBtn:hover {
+    background: #1557d6;
+    transform: translateY(-2px);
+}
+
+/* Forgot / info text */
+.info-text {
+    margin-top: 15px;
+    font-size: 14px;
+    color: #555;
+}
+</style>
+</head>
+<body>
+
+<div class="login-container">
+    <img src="AirWing logo.png" class="logo" alt="AirWing Logo">
+    <h2>Login / Register</h2>
+    <input type="email" id="email" placeholder="Enter your email" required>
+    <input type="password" id="password" placeholder="Enter your password" required>
+    <button id="loginBtn">Login / Register</button>
+    <p class="info-text">We'll keep your info safe ✈️</p>
+</div>
+
+<script>
+document.getElementById('loginBtn').addEventListener('click', () => {
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value.trim();
+    if(!email || !password) return alert("Please enter both email and password");
+
+    // Save user info locally
+    localStorage.setItem('loggedInUser', JSON.stringify({email, password}));
+
+    // Redirect to flights page
+    window.location.href = "flights.html";
+});
+</script>
+
+</body>
+</html>

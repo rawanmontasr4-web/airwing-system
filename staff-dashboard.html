@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Staff Dashboard</title>
+<style>
+  body { font-family: Arial, sans-serif; margin:0; background:#e6f0ff; }
+  .navbar { background:#1d70ff; color:white; padding:15px 30px; display:flex; justify-content:space-between; align-items:center; }
+  .navbar h2 { margin:0; display:flex; align-items:center; gap:15px; }
+  .navbar h2 img { width:50px; height:50px; object-fit:contain; }
+  .navbar button { padding:8px 15px; background:#004080; border:none; border-radius:8px; color:white; cursor:pointer; transition:0.3s; }
+  .navbar button:hover { background:#003366; }
+  .main { display:flex; height:calc(100vh - 80px); overflow:hidden; }
+  .sidebar { width:220px; background:white; padding:20px; box-shadow:2px 0 5px rgba(0,0,0,0.1); }
+  .sidebar button { width:100%; padding:12px; margin-bottom:10px; border:none; border-radius:8px; background:#1d70ff; color:white; cursor:pointer; font-size:16px; transition:0.3s; }
+  .sidebar button:hover { background:#1557d6; }
+  .content { flex:1; padding:20px; overflow:auto; }
+  h3 { margin-top:0; color:#004080; }
+  .card-container { display:flex; gap:15px; margin-bottom:15px; flex-wrap:wrap; }
+  .card { background:white; padding:15px 20px; border-radius:10px; box-shadow:0 5px 15px rgba(0,0,0,0.1); flex:1; text-align:center; min-width:120px; }
+  .card h4 { margin:0; color:#1d70ff; }
+  .card p { font-size:18px; margin:5px 0 0 0; font-weight:bold; }
+  table { width:100%; border-collapse:collapse; margin-top:10px; min-width:600px; }
+  th, td { padding:10px; border:1px solid #ccc; text-align:center; }
+  th { background:#1d70ff; color:white; }
+  .status.OnTime { background:#28a745; color:white; padding:5px 10px; border-radius:5px; }
+  .status.Delayed { background:#ffc107; color:white; padding:5px 10px; border-radius:5px; }
+  .status.Boarding { background:#17a2b8; color:white; padding:5px 10px; border-radius:5px; }
+  .status.Departed { background:#6c757d; color:white; padding:5px 10px; border-radius:5px; }
+  button.editBtn { background:#17a2b8; padding:5px 8px; border-radius:5px; color:white; cursor:pointer; margin-right:5px; transition:0.3s; }
+  button.editBtn:hover { background:#117a8b; }
+  .page { display:none; }
+  .page.active { display:block; }
+  .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; }
+  .modal-content { background:white; padding:20px; border-radius:12px; width:90%; max-width:600px; max-height:85vh; overflow-y:auto; box-shadow:0 10px 30px rgba(0,0,0,0.2); position:relative; transition:0.3s; }
+  .modal-content h3 { margin-top:0; color:#004080; text-align:center; }
+  .modal-content label { display:block; margin-top:10px; font-weight:bold; }
+  .modal-content input, .modal-content select { width:100%; padding:8px; margin-top:5px; border-radius:5px; border:1px solid #ccc; }
+  .modal-content button { margin-top:15px; padding:10px; border:none; border-radius:8px; cursor:pointer; color:white; width:48%; transition:0.3s; }
+  .modal-content button.save { background:#28a745; }
+  .modal-content button.save:hover { background:#218838; }
+  .modal-content button.close { background:#dc3545; float:right; }
+  .modal-content button.close:hover { background:#a71d2a; }
+  @media(max-width:768px){
+    .main { flex-direction:column; }
+    .sidebar { width:100%; display:flex; overflow-x:auto; }
+    .sidebar button { flex:1; }
+    table { min-width:0; font-size:14px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="navbar">
+  <h2><img src="AirWing logo.png" alt="Logo"> AirWing Staff Dashboard</h2>
+  <button onclick="logout()">Logout</button>
+</div>
+
+<div class="main">
+  <div class="sidebar">
+    <button onclick="showPage('flights')">Flights</button>
+    <button onclick="showPage('passengers')">Passengers Bookings</button>
+    <button onclick="showPage('meals')">Meals</button>
+    <button onclick="showPage('staff')">Staff</button>
+  </div>
+
+  <div class="content">
+    <div class="card-container">
+      <div class="card" id="totalFlightsCard"><h4>Total Flights</h4><p>0</p></div>
+      <div class="card" id="totalPassengersCard"><h4>Total Passengers</h4><p>0</p></div>
+      <div class="card" id="totalMealsCard"><h4>Total Meals</h4><p>0</p></div>
+      <div class="card" id="totalStaffCard"><h4>Total Staff</h4><p>0</p></div>
+    </div>
+
+    <!-- Flights -->
+    <div id="flights" class="page active">
+      <h3>Flights</h3>
+      <table id="flightsTable">
+        <thead>
+          <tr><th>ID</th><th>From</th><th>To</th><th>Time</th><th>Gate</th><th>Status</th><th>Price</th><th>Aircraft</th><th>Class</th><th>Payment</th><th>Actions</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <!-- Passengers Bookings -->
+    <div id="passengers" class="page">
+      <h3>Passengers Bookings</h3>
+      <table id="passengersTable">
+        <thead>
+          <tr><th>Passenger</th><th>Passport</th><th>Seat</th><th>Flight ID</th><th>Date/Time</th><th>Aircraft</th><th>Ticket Type</th><th>Actions</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <!-- Meals -->
+    <div id="meals" class="page">
+      <h3>Meals</h3>
+      <table id="mealsTable">
+        <thead>
+          <tr><th>Passenger</th><th>Meal</th><th>Flight ID</th><th>Price</th><th>Actions</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <!-- Staff -->
+    <div id="staff" class="page">
+      <h3>Staff</h3>
+      <table id="staffTable">
+        <thead>
+          <tr><th>Name</th><th>Email</th><th>Role</th><th>Permissions</th><th>Actions</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal" id="editModal" onclick="if(event.target==this) closeModal()">
+  <div class="modal-content">
+    <h3>Edit Entry</h3>
+    <div id="modalFields"></div>
+    <button class="save" onclick="saveEdit()">Save</button>
+    <button class="close" onclick="closeModal()">Close</button>
+  </div>
+</div>
+
+<script>
+function logout(){ window.location.href="staff-login.html"; }
+function showPage(id){ document.querySelectorAll(".page").forEach(p=>p.classList.remove("active")); document.getElementById(id).classList.add("active"); }
+
+// --- البيانات ---
+let flightsData=[
+  {"id":"AW101","from":"Cairo","to":"Dubai","departure":"10:30 AM","date":"2025-12-30","gate":"A12","status":"On Time","price":4500,"aircraft":"Airbus A320","class":"Economy","payment":"Card"},
+  {"id":"AW202","from":"Cairo","to":"Riyadh","departure":"03:00 PM","date":"2025-12-31","gate":"B7","status":"Delayed","price":3800,"aircraft":"Boeing 737","class":"Economy","payment":"Cash"},
+  {"id":"AW303","from":"Cairo","to":"Paris","departure":"07:45 AM","date":"2026-01-01","gate":"C3","status":"On Time","price":7200,"aircraft":"Airbus A330","class":"Business","payment":"Card"}
+];
+
+let passengersData=[
+  {"passenger":"Mohamed Magdey","passport":"A123","seat":"12A","flightId":"AW101","date":"2025-12-30 10:30 AM","aircraft":"Airbus A320","ticketType":"Economy"},
+  {"passenger":"Samar Samer","passport":"B456","seat":"14B","flightId":"AW202","date":"2025-12-31 03:00 PM","aircraft":"Boeing 737","ticketType":"Economy"},
+  {"passenger":"Hamza Magdey","passport":"C789","seat":"2C","flightId":"AW303","date":"2026-01-01 07:45 AM","aircraft":"Airbus A330","ticketType":"Business"},
+  {"passenger":"Rawan Essam","passport":"D012","seat":"3D","flightId":"AW101","date":"2025-12-30 10:30 AM","aircraft":"Airbus A320","ticketType":"Economy"}
+];
+
+let mealsData=[
+  {"passenger":"Mohamed Magdey","meal":"Chicken","flightId":"AW101","price":50},
+  {"passenger":"Samar Samer","meal":"Vegetarian","flightId":"AW202","price":55},
+  {"passenger":"Hamza Magdey","meal":"Beef","flightId":"AW303","price":60},
+  {"passenger":"Rawan Essam","meal":"Vegan","flightId":"AW101","price":50}
+];
+
+let staffData=[
+  {"email":"staff@airport.com","password":"123456","name":"Ahmed","role":"staff","permissions":["manage_flights","manage_bookings","view_meals"]},
+  {"email":"staff2@airport.com","password":"abcdef","name":"Mona","role":"staff","permissions":["manage_bookings","view_meals"]}
+];
+
+// --- تحميل الجداول ---
+window.onload = ()=>{
+  document.querySelector("#totalFlightsCard p").textContent = flightsData.length;
+  document.querySelector("#totalPassengersCard p").textContent = passengersData.length;
+  document.querySelector("#totalMealsCard p").textContent = mealsData.length;
+  document.querySelector("#totalStaffCard p").textContent = staffData.length;
+
+  loadFlightsTable();
+  loadPassengersTable();
+  loadMealsTable();
+  loadStaffTable();
+};
+
+function loadFlightsTable(){
+  let tbody=document.querySelector("#flightsTable tbody"); tbody.innerHTML="";
+  flightsData.forEach((f,i)=>{
+    tbody.innerHTML+=`<tr>
+      <td>${f.id}</td><td>${f.from}</td><td>${f.to}</td><td>${f.departure}</td><td>${f.gate}</td><td><span class="status ${f.status.replace(" ","")}">${f.status}</span></td><td>${f.price}</td><td>${f.aircraft}</td><td>${f.class}</td><td>${f.payment}</td>
+      <td><button class="editBtn" onclick="openModal('flight',${i})">Edit</button></td>
+    </tr>`;
+  });
+}
+
+function loadPassengersTable(){
+  let tbody=document.querySelector("#passengersTable tbody"); tbody.innerHTML="";
+  passengersData.forEach((p,i)=>{
+    tbody.innerHTML+=`<tr>
+      <td>${p.passenger}</td><td>${p.passport}</td><td>${p.seat}</td><td>${p.flightId}</td><td>${p.date}</td><td>${p.aircraft}</td><td>${p.ticketType}</td>
+      <td><button class="editBtn" onclick="openModal('passenger',${i})">Edit</button></td>
+    </tr>`;
+  });
+}
+
+function loadMealsTable(){
+  let tbody=document.querySelector("#mealsTable tbody"); tbody.innerHTML="";
+  mealsData.forEach((m,i)=>{
+    tbody.innerHTML+=`<tr>
+      <td>${m.passenger}</td><td>${m.meal}</td><td>${m.flightId}</td><td>${m.price}</td>
+      <td><button class="editBtn" onclick="openModal('meal',${i})">Edit</button></td>
+    </tr>`;
+  });
+}
+
+function loadStaffTable(){
+  let tbody=document.querySelector("#staffTable tbody"); tbody.innerHTML="";
+  staffData.forEach((s,i)=>{
+    tbody.innerHTML+=`<tr>
+      <td>${s.name}</td><td>${s.email}</td><td>${s.role}</td><td>${s.permissions.join(", ")}</td>
+      <td><button class="editBtn" onclick="openModal('staff',${i})">Edit</button></td>
+    </tr>`;
+  });
+}
+
+// --- Modal Edit ---
+let editingType="", editingIndex=null;
+function openModal(type,index){
+  editingType=type; editingIndex=index;
+  const modal=document.getElementById("editModal"); 
+  const fields=document.getElementById("modalFields"); fields.innerHTML="";
+
+  let data;
+  if(type==="flight") data=flightsData[index];
+  if(type==="passenger") data=passengersData[index];
+  if(type==="meal") data=mealsData[index];
+  if(type==="staff") data=staffData[index];
+
+  for(const key in data){
+    fields.innerHTML+=`<label>${key}</label><input id="modal_${key}" value="${Array.isArray(data[key]) ? data[key].join(", ") : data[key]}">`;
+  }
+  modal.style.display="flex";
+}
+
+function closeModal(){ document.getElementById("editModal").style.display="none"; }
+
+function saveEdit(){
+  let data;
+  if(editingType==="flight") data=flightsData[editingIndex];
+  if(editingType==="passenger") data=passengersData[editingIndex];
+  if(editingType==="meal") data=mealsData[editingIndex];
+  if(editingType==="staff") data=staffData[editingIndex];
+
+  for(const key in data){
+    if(Array.isArray(data[key])){
+      data[key]=document.getElementById("modal_"+key).value.split(",").map(s=>s.trim());
+    } else {
+      data[key]=document.getElementById("modal_"+key).value;
+    }
+  }
+
+  closeModal();
+  loadFlightsTable();
+  loadPassengersTable();
+  loadMealsTable();
+  loadStaffTable();
+}
+</script>
+
+</body>
+</html>

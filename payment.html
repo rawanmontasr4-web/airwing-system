@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Payment</title>
+<style>
+body { font-family:"Segoe UI",Arial; background:#eef3ff; padding:20px;}
+.header { display:flex; align-items:center; gap:15px; background:#1d70ff; padding:10px 20px; border-radius:0 0 15px 15px; color:white; margin-bottom:20px;}
+.header .logo { width:50px; height:50px; object-fit:contain;}
+.header h1 { margin:0; font-size:24px;}
+.box { max-width:500px; margin:auto; background:#fff; padding:25px; border-radius:18px; box-shadow:0 12px 25px rgba(0,0,0,0.12);}
+h2 { text-align:center; color:#1d70ff;}
+.method { display:flex; align-items:center; gap:10px; margin:12px 0; padding:14px; border:1px solid #ccc; border-radius:12px; cursor:pointer; transition:.2s;}
+.method:hover { background:#eef4ff; border-color:#1d70ff; }
+button { width:100%; background:#1d70ff; color:white; padding:14px; border:none; border-radius:12px; margin-top:20px; cursor:pointer; font-size:18px;}
+</style>
+</head>
+<body>
+
+<div class="header">
+    <img src="AirWing logo.png" alt="AirWing Logo" class="logo">
+    <h1>AirWing Airlines</h1>
+</div>
+
+<div class="box">
+    <h2>Select Payment Method</h2>
+    <label class="method"><input type="radio" name="pay" value="Credit Card"> Credit Card</label>
+    <label class="method"><input type="radio" name="pay" value="Vodafone Cash"> Vodafone Cash</label>
+    <label class="method"><input type="radio" name="pay" value="PayPal"> PayPal</label>
+    <button onclick="goTicket()">Confirm & View Ticket</button>
+</div>
+
+<script>
+function goTicket(){
+    const method = document.querySelector("input[name='pay']:checked");
+    if(!method){ alert("Please select a payment method"); return; }
+    localStorage.setItem("payment", method.value);
+    window.location.href="ticket.html";
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AirWing Airlines - Flights</title>
+<style>
+/* Reset & font */
+body {
+    margin: 0;
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: linear-gradient(135deg,#cce0ff,#f0f6ff);
+}
+
+/* Header */
+.header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: #1d70ff;
+    padding: 10px 20px;
+    color: white;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+.header .logo { width:50px; height:50px; object-fit:contain; }
+.header h1 { margin:0; font-size:24px; }
+
+/* Container */
+.container {
+    max-width: 900px;
+    margin: 30px auto;
+    background: white;
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+}
+
+/* Title */
+h2 { text-align:center; color:#1d70ff; margin-bottom:20px; }
+
+/* Table */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    font-size:16px;
+}
+th, td {
+    padding: 14px;
+    border-bottom: 1px solid #ccc;
+    text-align: center;
+}
+th {
+    background: #1d70ff;
+    color: white;
+}
+tr:hover {
+    background: #e6f2ff;
+    cursor: pointer;
+}
+
+/* Buttons */
+button {
+    padding: 8px 12px;
+    background: #1d70ff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+button:hover {
+    background: #1557d6;
+    transform: translateY(-2px);
+}
+
+/* Popup */
+.popup {
+    display: none;
+    position: fixed;
+    top:0; left:0;
+    width:100%; height:100%;
+    background: rgba(0,0,0,0.6);
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.3s;
+}
+@keyframes fadeIn {
+    from {opacity:0;}
+    to {opacity:1;}
+}
+.popup-box {
+    background: white;
+    padding: 25px;
+    width: 400px;
+    border-radius: 15px;
+    text-align: left;
+    box-shadow: 0 12px 25px rgba(0,0,0,0.2);
+}
+.popup-box h3 { text-align:center; color:#1d70ff; margin-bottom:15px; }
+.popup-box p { margin:6px 0; font-size:16px; }
+.popup-box button { margin-top:15px; width:100%; }
+
+/* Responsive */
+@media(max-width: 500px){
+    .container { padding:15px; }
+    table, th, td { font-size:14px; padding:10px; }
+    .popup-box { width:90%; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+    <img src="AirWing logo.png" class="logo" alt="AirWing Logo">
+    <h1>AirWing Airlines</h1>
+</div>
+
+<div class="container">
+    <h2>Available Flights</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>From</th>
+                <th>To</th>
+                <th>Time</th>
+                <th>Price</th>
+                <th>Details</th>
+                <th>Book</th>
+            </tr>
+        </thead>
+        <tbody id="flightTable"></tbody>
+    </table>
+</div>
+
+<!-- Popup -->
+<div class="popup" id="popup">
+    <div class="popup-box">
+        <h3>Flight Details</h3>
+        <p><strong>Route:</strong> <span id="dRoute"></span></p>
+        <p><strong>Date:</strong> <span id="dDate"></span></p>
+        <p><strong>Flight Number:</strong> <span id="dNumber"></span></p>
+        <p><strong>Aircraft:</strong> <span id="dAircraft"></span></p>
+        <p><strong>Class:</strong> <span id="dClass"></span></p>
+        <p><strong>Payment:</strong> <span id="dPayment"></span></p>
+        <button onclick="closePopup()">Close</button>
+    </div>
+</div>
+
+<script>
+let flightsData = [
+    {id:1, from:"Cairo", to:"Dubai", time:"10:30 AM", price:"6500 EGP", route:"Cairo → Dubai", date:"2025-12-30", flightNumber:"AW101", aircraft:"Boeing 777", class:"Economy", payment:"Cash/Card"},
+    {id:2, from:"Cairo", to:"Riyadh", time:"01:00 PM", price:"4800 EGP", route:"Cairo → Riyadh", date:"2025-12-31", flightNumber:"AW102", aircraft:"Airbus A320", class:"Economy", payment:"Cash/Card"},
+    {id:3, from:"Cairo", to:"London", time:"09:15 AM", price:"12500 EGP", route:"Cairo → London", date:"2026-01-01", flightNumber:"AW103", aircraft:"Boeing 787", class:"Business", payment:"Card/PayPal"}
+];
+
+let table = document.getElementById("flightTable");
+
+flightsData.forEach(flight=>{
+    let row = `
+        <tr>
+            <td>${flight.from}</td>
+            <td>${flight.to}</td>
+            <td>${flight.time}</td>
+            <td>${flight.price}</td>
+            <td><button onclick="showDetails(${flight.id})">Details</button></td>
+            <td><button onclick="bookFlight(${flight.id})">Book</button></td>
+        </tr>
+    `;
+    table.innerHTML += row;
+});
+
+function showDetails(id){
+    const f = flightsData.find(x=>x.id===id);
+    document.getElementById("dRoute").innerText = f.route;
+    document.getElementById("dDate").innerText = f.date;
+    document.getElementById("dNumber").innerText = f.flightNumber;
+    document.getElementById("dAircraft").innerText = f.aircraft;
+    document.getElementById("dClass").innerText = f.class;
+    document.getElementById("dPayment").innerText = f.payment;
+    document.getElementById("popup").style.display = "flex";
+}
+function closePopup(){ document.getElementById("popup").style.display = "none"; }
+function bookFlight(id){
+    const selectedFlight = flightsData.find(x=>x.id===id);
+    localStorage.setItem("selectedFlight", JSON.stringify(selectedFlight));
+    window.location.href="booking.html";
+}
+</script>
+
+</body>
+</html>

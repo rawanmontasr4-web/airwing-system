@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Login</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="login-box">
+    <img src="AirWing logo.png" class="logo"/>
+    <h2>SkyWing Airlines - Admin Login</h2>
+    <div class="input-group">
+      <i class="fa fa-envelope"></i>
+      <input type="email" placeholder="Email" id="email"/>
+    </div>
+
+    <div class="input-group">
+      <i class="fa fa-lock"></i>
+      <input type="password" placeholder="Password" id="password"/>
+    </div>
+
+    <div class="checkbox-group">
+      <input type="checkbox" id="remember"/> Remember Me
+    </div>
+
+    <div class="error-msg" id="errorMsg">Invalid email or password!</div>
+
+    <button onclick="login()">Login</button>
+  </div>
+
+  <script>
+    const admins = [
+      "nouransallam@gmail.com",
+      "rodinaarafat@gmail.com",
+      "kenzyatef@gmail.com",
+      "tasneemwael@gmail.com"
+    ];
+
+    const password = "1234";
+
+    function login() {
+      const email = document.getElementById('email').value;
+      const pass = document.getElementById('password').value;
+      const errorMsg = document.getElementById('errorMsg');
+
+      if(admins.includes(email) && pass === password){
+        window.location = 'adminDashboard.html';
+      } else {
+        errorMsg.style.display = 'block';
+      }
+    }
+  </script>
+</body>
+</html>

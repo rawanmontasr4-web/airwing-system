@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login Portal - SkyWing Airlines</title>
+<style>
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: #e6f0ff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.login-container {
+    background: white;
+    padding: 40px 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    text-align: center;
+    width: 320px;
+    transition: transform 0.3s;
+}
+
+.login-container:hover {
+    transform: translateY(-5px);
+}
+
+.login-container img {
+    width: 70px;
+    height: 70px;
+    object-fit: contain;
+    margin-bottom: 15px;
+}
+
+.login-container h2 {
+    color: #004080;
+    margin-bottom: 25px;
+}
+
+.select-type {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+}
+
+.login-btn {
+    width: 100%;
+    padding: 12px;
+    background: #1d70ff;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.login-btn:hover {
+    background: #1557d6;
+}
+
+footer {
+    margin-top: 15px;
+    font-size: 14px;
+    color: #555;
+}
+</style>
+</head>
+<body>
+
+<div class="login-container">
+    <img src="AirWing logo.png" alt="AirWing Logo">
+    <h2>Login Portal</h2>
+    <select id="userType" class="select-type">
+        <option value="">Select Account Type</option>
+        <option value="passenger">Passenger</option>
+        <option value="staff">Staff</option>
+        <option value="admin">Admin</option>
+    </select>
+    <button class="login-btn" onclick="goToLogin()">Login</button>
+    <footer>SkyWing Airlines &copy; 2025</footer>
+</div>
+
+<script>
+function goToLogin(){
+    const type = document.getElementById('userType').value;
+    if(!type){
+        alert("Please select an account type.");
+        return;
+    }
+
+    switch(type){
+        case 'passenger':
+            window.location.href = "passlogin.html";
+            break;
+        case 'staff':
+            window.location.href = "staff-login.html";
+            break;
+        case 'admin':
+            window.location.href = "adminLogin.html";
+            break;
+    }
+}
+</script>
+
+</body>
+</html>

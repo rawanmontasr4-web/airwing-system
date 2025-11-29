@@ -1,0 +1,27 @@
+[
+    {
+      "id": "M001",
+      "bookingId": "B001",
+      "flightId": "AW101",
+      "passenger": "Rawan Mohamed",
+      "meal": "Vegetarian",
+      "price": 50
+    },
+    {
+      "id": "M002",
+      "bookingId": "B002",
+      "flightId": "AW202",
+      "passenger": "Omar Ali",
+      "meal": "Chicken",
+      "price": 60
+    },
+    {
+      "id": "M003",
+      "bookingId": "B003",
+      "flightId": "AW303",
+      "passenger": "Laila Hassan",
+      "meal": "Vegan",
+      "price": 55
+    }
+  ]
+  

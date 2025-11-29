@@ -1,0 +1,41 @@
+[
+  {
+      "id": 1,
+      "from": "Cairo",
+      "to": "Dubai",
+      "time": "10:30 AM",
+      "date": "2025-01-12",
+      "flightNumber": "AW102",
+      "price": "6500 EGP",
+      "aircraft": "Airbus A320",
+      "class": "Economy",
+      "payment": "Online or Airport Counter",
+      "route": "Cairo → Dubai"
+  },
+  {
+      "id": 2,
+      "from": "Cairo",
+      "to": "Riyadh",
+      "time": "01:00 PM",
+      "date": "2025-01-15",
+      "flightNumber": "AW233",
+      "price": "4800 EGP",
+      "aircraft": "Boeing 737",
+      "class": "Business",
+      "payment": "Credit Card Only",
+      "route": "Cairo → Riyadh"
+  },
+  {
+      "id": 3,
+      "from": "Cairo",
+      "to": "London",
+      "time": "09:15 AM",
+      "date": "2025-01-20",
+      "flightNumber": "AW450",
+      "price": "12500 EGP",
+      "aircraft": "Boeing 787 Dreamliner",
+      "class": "Economy",
+      "payment": "Online or Airport Counter",
+      "route": "Cairo → London"
+  }
+]

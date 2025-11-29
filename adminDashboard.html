@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard - SkyWing Airlines</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+body { font-family: "Segoe UI", Arial; background: #e6f0ff; margin:0; padding:0;}
+.navbar { display:flex; align-items:center; background:#1d70ff; padding:12px 20px; color:white; gap:20px; }
+.navbar .logo { width:50px; height:50px; object-fit:contain;}
+.navbar a { color:white; text-decoration:none; padding:6px 12px; border-radius:6px;}
+.navbar a.active, .navbar a:hover { background:#1557d6;}
+.navbar span.company-name { font-weight:bold; font-size:20px; margin-right:auto;}
+
+/* Cards */
+.cards { display:flex; gap:20px; padding:20px; flex-wrap:wrap; justify-content:center;}
+.card { flex:1 1 180px; background:white; border-radius:15px; padding:20px; text-align:center;
+       box-shadow:0 8px 20px rgba(0,0,0,0.15); cursor:pointer; transition:0.3s;}
+.card:hover { transform:translateY(-5px); box-shadow:0 12px 25px rgba(0,0,0,0.25);}
+.card h3 { margin-bottom:12px; color:#004080; }
+.card p { font-size:24px; font-weight:bold; color:#1d70ff;}
+
+/* Details Section */
+#detailsSection { display:none; padding:20px; margin:10px 20px; background:white; border-radius:15px; box-shadow:0 8px 20px rgba(0,0,0,0.1);}
+#detailsSection h2 { margin-bottom:15px; color:#004080; display:flex; justify-content:space-between; align-items:center;}
+#detailsSection h2 span { cursor:pointer; font-size:18px; color:#1d70ff; }
+.detailsContent { display:flex; gap:20px; flex-wrap:wrap; justify-content:center; }
+#detailsTable { width:45%; border-collapse:collapse; margin-bottom:15px; }
+#detailsTable th, #detailsTable td { padding:10px; border-bottom:1px solid #ccc; text-align:center; }
+#detailsTable th { background:#1d70ff; color:white; border-radius:5px; }
+
+/* Chart next to table */
+.chart-container { width:45%; padding:15px; background:white; border-radius:15px; box-shadow:0 8px 20px rgba(0,0,0,0.1); }
+.chart-container h4 { text-align:center; color:#004080; margin-bottom:15px; }
+.summary-text { text-align:center; font-size:16px; color:#333; margin-top:10px; }
+
+/* General Charts */
+.generalCharts { display:block; }
+.generalCharts .chart-container { width:90%; max-width:700px; margin:20px auto; }
+
+/* Back arrow */
+.backArrow { font-size:20px; cursor:pointer; }
+</style>
+</head>
+<body>
+
+<div class="navbar">
+  <img src="AirWing logo.png" class="logo"/>
+  <span class="company-name">SkyWing Airlines</span>
+  <a href="#" class="active" onclick="showDashboard()">Dashboard</a>
+  <a href="manageUsers.html">Manage Users</a>
+  <a href="adminLogin.html">Logout</a>
+</div>
+
+<!-- Cards -->
+<div class="cards" id="cardsSection">
+  <div class="card" onclick="showDetails('flights')"><h3>Total Flights</h3><p id="totalFlights">0</p></div>
+  <div class="card" onclick="showDetails('bookings')"><h3>Total Bookings</h3><p id="totalBookings">0</p></div>
+  <div class="card" onclick="showDetails('passengers')"><h3>Total Passengers</h3><p id="totalPassengers">0</p></div>
+  <div class="card" onclick="showDetails('meals')"><h3>Total Meal Orders</h3><p id="totalMeals">0</p></div>
+  <div class="card" onclick="showDetails('problems')"><h3>Reported Problems</h3><p id="totalProblems">0</p></div>
+  <div class="card" onclick="showDetails('staff')"><h3>Staff Performance</h3><p>Overview</p></div>
+</div>
+
+<!-- Details Section -->
+<div id="detailsSection">
+  <h2>
+    <span id="detailsTitle"></span>
+    <span class="backArrow" onclick="showDashboard()">&#8592; Back</span>
+  </h2>
+  <div class="detailsContent">
+    <table id="detailsTable"></table>
+    <div class="chart-container">
+      <h4 id="chartTitle"></h4>
+      <canvas id="detailsChart"></canvas>
+      <div class="summary-text" id="summaryText"></div>
+    </div>
+  </div>
+</div>
+
+<!-- General Charts -->
+<div id="generalCharts" class="generalCharts">
+  <div class="chart-container"><h4>Monthly Revenue</h4><canvas id="revenueChart"></canvas><div class="summary-text">Revenue increased 15% compared to last month.</div></div>
+  <div class="chart-container"><h4>Revenue Last 5 Years</h4><canvas id="revenue5YearsChart"></canvas><div class="summary-text">Consistent growth with minor fluctuations.</div></div>
+  <div class="chart-container"><h4>Peak Travel Times</h4><canvas id="peakTimesChart"></canvas><div class="summary-text">Most travelers prefer morning flights.</div></div>
+</div>
+
+<script>
+// ---------------- Data ----------------
+const flights = [{no:"FL100",origin:"Cairo",destination:"Dubai",status:"On Time"},{no:"FL200",origin:"Cairo",destination:"Riyadh",status:"Delayed"},{no:"FL300",origin:"Cairo",destination:"London",status:"Cancelled"},{no:"FL400",origin:"Cairo",destination:"Paris",status:"On Time"}];
+const bookingsData = [{id:"B001",flight:"FL100",passenger:"Rawan Essam"},{id:"B002",flight:"FL200",passenger:"Omar Ali"},{id:"B003",flight:"FL300",passenger:"Samar Samer"},{id:"B004",flight:"FL400",passenger:"Mohamed Magdy"}];
+const passengersData = [{id:"P001",name:"Rawan Essam",flight:"FL100"},{id:"P002",name:"Omar Ali",flight:"FL200"},{id:"P003",name:"Samar Samer",flight:"FL300"},{id:"P004",name:"Mohamed Magdy",flight:"FL400"}];
+const mealsData = [{id:"M001",passenger:"Rawan Essam",meal:"Vegetarian"},{id:"M002",passenger:"Omar Ali",meal:"Chicken"},{id:"M003",passenger:"Samar Samer",meal:"Vegan"},{id:"M004",passenger:"Mohamed Magdy",meal:"Beef"}];
+const problemsData = [{id:"PR001",type:"Flight Delay",loss:1000},{id:"PR002",type:"Meal Issue",loss:200},{id:"PR003",type:"Booking Error",loss:500},{id:"PR004",type:"Seat Assignment Error",loss:300}];
+const staffData = [{id:"S001",name:"Ahmed Ali",attendance:"Present",efficiency:"High"},{id:"S002",name:"Mona Samer",attendance:"Absent",efficiency:"Medium"},{id:"S003",name:"Khaled Omar",attendance:"Present",efficiency:"High"},{id:"S004",name:"Sara Mohamed",attendance:"Present",efficiency:"Low"}];
+
+// ---------------- Populate Cards ----------------
+document.getElementById('totalFlights').innerText = flights.length;
+document.getElementById('totalBookings').innerText = bookingsData.length;
+document.getElementById('totalPassengers').innerText = passengersData.length;
+document.getElementById('totalMeals').innerText = mealsData.length;
+document.getElementById('totalProblems').innerText = problemsData.length;
+
+// ---------------- General Charts ----------------
+new Chart(document.getElementById('revenueChart'),{type:'bar',data:{labels:['Jan','Feb','Mar','Apr','May','Jun'],datasets:[{label:'Revenue (EGP)',data:[5000,7000,6500,8000,9000,7500],backgroundColor:'#4facfe'}]}});
+new Chart(document.getElementById('revenue5YearsChart'),{type:'line',data:{labels:['2019','2020','2021','2022','2023'],datasets:[{label:'Revenue (EGP)',data:[45000,48000,50000,55000,60000],borderColor:'#00f2fe',fill:false,tension:0.4}]}});
+new Chart(document.getElementById('peakTimesChart'),{type:'bar',data:{labels:['6-9 AM','9-12 PM','12-3 PM','3-6 PM','6-9 PM'],datasets:[{label:'Passengers',data:[30,50,40,25,15],backgroundColor:'#43e97b'}]}});
+
+// ---------------- Show Details ----------------
+let detailsChart;
+function showDetails(type){
+  document.getElementById('cardsSection').style.display='none';
+  document.getElementById('generalCharts').style.display='none';
+  document.getElementById('detailsSection').style.display='block';
+
+  const table = document.getElementById('detailsTable'); table.innerHTML="";
+  const chartCanvas = document.getElementById('detailsChart');
+  const chartTitle = document.getElementById('chartTitle');
+  const summaryText = document.getElementById('summaryText');
+  if(detailsChart) detailsChart.destroy();
+
+  if(type==='flights'){
+    document.getElementById('detailsTitle').innerText="Flights Details";
+    chartTitle.innerText="Flight Status Distribution";
+    summaryText.innerText="Overview of flight statuses.";
+    table.innerHTML=`<tr><th>Flight No</th><th>Origin</th><th>Destination</th><th>Status</th></tr>`;
+    const counts={"On Time":0,"Delayed":0,"Cancelled":0};
+    flights.forEach(f=>{ const row=table.insertRow(); row.insertCell(0).innerText=f.no; row.insertCell(1).innerText=f.origin; row.insertCell(2).innerText=f.destination; row.insertCell(3).innerText=f.status; counts[f.status]++; });
+    detailsChart=new Chart(chartCanvas,{type:'pie',data:{labels:Object.keys(counts),datasets:[{data:Object.values(counts),backgroundColor:['#4facfe','#f093fb','#ff6a00']}]}});
+
+  } else if(type==='bookings'){
+    document.getElementById('detailsTitle').innerText="Bookings Details";
+    chartTitle.innerText="Bookings per Flight"; summaryText.innerText="Number of bookings per flight.";
+    table.innerHTML=`<tr><th>Booking ID</th><th>Flight</th><th>Passenger</th></tr>`;
+    const bookingCounts={};
+    bookingsData.forEach(b=>{ const row=table.insertRow(); row.insertCell(0).innerText=b.id; row.insertCell(1).innerText=b.flight; row.insertCell(2).innerText=b.passenger; bookingCounts[b.flight]=(bookingCounts[b.flight]||0)+1; });
+    detailsChart=new Chart(chartCanvas,{type:'bar',data:{labels:Object.keys(bookingCounts),datasets:[{label:'Bookings',data:Object.values(bookingCounts),backgroundColor:'#00f2fe'}]}});
+
+  } else if(type==='passengers'){
+    document.getElementById('detailsTitle').innerText="Passengers Details";
+    chartTitle.innerText="Passengers per Flight"; summaryText.innerText="Number of passengers per flight.";
+    table.innerHTML=`<tr><th>Passenger ID</th><th>Name</th><th>Flight</th></tr>`;
+    const counts={};
+    passengersData.forEach(p=>{ const row=table.insertRow(); row.insertCell(0).innerText=p.id; row.insertCell(1).innerText=p.name; row.insertCell(2).innerText=p.flight; counts[p.flight]=(counts[p.flight]||0)+1; });
+    detailsChart=new Chart(chartCanvas,{type:'line',data:{labels:Object.keys(counts),datasets:[{label:'Passengers',data:Object.values(counts),borderColor:'#43e97b',fill:false,tension:0.4}]} });
+
+  } else if(type==='meals'){
+    document.getElementById('detailsTitle').innerText="Meal Orders Details";
+    chartTitle.innerText="Meal Preferences"; summaryText.innerText="Distribution of meal types.";
+    table.innerHTML=`<tr><th>Meal ID</th><th>Passenger</th><th>Meal</th></tr>`;
+    const counts={};
+    mealsData.forEach(m=>{ const row=table.insertRow(); row.insertCell(0).innerText=m.id; row.insertCell(1).innerText=m.passenger; row.insertCell(2).innerText=m.meal; counts[m.meal]=(counts[m.meal]||0)+1; });
+    detailsChart=new Chart(chartCanvas,{type:'radar',data:{labels:Object.keys(counts),datasets:[{label:'Meals',data:Object.values(counts),backgroundColor:'rgba(255,105,0,0.4)',borderColor:'#ff6a00',fill:true}]} });
+
+  } else if(type==='problems'){
+    document.getElementById('detailsTitle').innerText="Reported Problems Details";
+    chartTitle.innerText="Problems & Loss Percentage"; summaryText.innerText="Proportion of losses per problem type.";
+    table.innerHTML=`<tr><th>Problem ID</th><th>Type</th><th>Loss (EGP)</th></tr>`;
+    const counts={}; let totalLoss=0;
+    problemsData.forEach(p=>{ const row=table.insertRow(); row.insertCell(0).innerText=p.id; row.insertCell(1).innerText=p.type; row.insertCell(2).innerText=p.loss; counts[p.type]=p.loss; totalLoss+=p.loss; });
+    detailsChart=new Chart(chartCanvas,{type:'doughnut',data:{labels:Object.keys(counts),datasets:[{data:Object.values(counts),backgroundColor:['#ff4d4d','#ff9933','#ffcc00','#4facfe']}]}, options:{plugins:{tooltip:{callbacks:{label:function(ctx){return ctx.label + ': '+((ctx.raw/totalLoss)*100).toFixed(2)+'%';}}}}}});
+
+  } else if(type==='staff'){
+    document.getElementById('detailsTitle').innerText="Staff Performance Details";
+    chartTitle.innerText="Staff Attendance & Efficiency"; summaryText.innerText="Overview of staff performance.";
+    table.innerHTML=`<tr><th>Staff ID</th><th>Name</th><th>Attendance</th><th>Efficiency</th></tr>`;
+    const attendance={Present:0,Absent:0}, efficiency={High:0,Medium:0,Low:0};
+    staffData.forEach(s=>{ const row=table.insertRow(); row.insertCell(0).innerText=s.id; row.insertCell(1).innerText=s.name; row.insertCell(2).innerText=s.attendance; row.insertCell(3).innerText=s.efficiency; attendance[s.attendance]++; efficiency[s.efficiency]++; });
+    detailsChart=new Chart(chartCanvas,{type:'bar',data:{labels:['Present','Absent'],datasets:[{label:'Attendance',data:[attendance.Present,attendance.Absent],backgroundColor:['#43e97b','#ff6a6a']},{label:'Efficiency High/Med/Low',data:[efficiency.High,efficiency.Medium,efficiency.Low],backgroundColor:['#4facfe','#f093fb','#ffb347']}] }});
+  }
+}
+
+// ---------------- Show Dashboard ----------------
+function showDashboard(){
+  document.getElementById('cardsSection').style.display='flex';
+  document.getElementById('generalCharts').style.display='block';
+  document.getElementById('detailsSection').style.display='none';
+}
+</script>
+</body>
+</html>

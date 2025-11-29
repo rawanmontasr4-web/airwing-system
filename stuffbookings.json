@@ -1,0 +1,24 @@
+[
+    {
+      "bookingId": "B001",
+      "flightId": "AW101",
+      "passenger": "Rawan Mohamed",
+      "passport": "A1234567",
+      "seat": "12A"
+    },
+    {
+      "bookingId": "B002",
+      "flightId": "AW202",
+      "passenger": "Omar Ali",
+      "passport": "B9988776",
+      "seat": "03C"
+    },
+    {
+      "bookingId": "B003",
+      "flightId": "AW303",
+      "passenger": "Laila Hassan",
+      "passport": "C5566778",
+      "seat": "07B"
+    }
+  ]
+  

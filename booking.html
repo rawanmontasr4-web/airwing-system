@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flight Booking</title>
+    <style>
+       body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: linear-gradient(135deg, #dbe9ff, #f0f6ff);
+            margin: 0;
+            padding: 20px;
+        }
+.container {
+            max-width: 900px;
+            margin: auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+        }
+        h2 { text-align: center; color: #1557d6; margin-bottom: 25px; }
+        .selected-flight {
+            border: 2px solid #1d70ff;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            background: #e0f0ff;
+            display: none;
+        }
+        .cards-container { display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; margin-bottom: 20px; }
+        .flight-card {
+            width: 250px; background: #f9fbff; border-radius: 15px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+            padding: 20px; cursor: pointer; transition: 0.3s;
+        }
+        .flight-card:hover { transform: translateY(-5px); box-shadow: 0 12px 25px rgba(29,112,255,0.3); }
+        .flight-card.selected { border: 2px solid #1d70ff; background: #e0f0ff; }
+        .flight-card h3 { margin: 0 0 10px 0; color: #1557d6; }
+        .flight-card p { margin: 5px 0; font-weight: 600; color: #333; }
+        .meals { display: flex; justify-content: space-between; margin-bottom: 20px; display: none; }
+        .meal-card { width: 23%; border: 2px solid #d0d9f5; border-radius: 12px; text-align: center; padding: 10px; cursor: pointer; transition: 0.2s; background: #f9fbff; }
+        .meal-card img { width: 100%; border-radius: 10px; }
+        .meal-card input { margin-top: 8px; }
+        .meal-card.selected { border-color: #1d70ff; background: #e0f0ff; box-shadow: 0 4px 8px rgba(29,112,255,0.3); }
+        .seats-container { margin-top: 20px; margin-bottom: 20px; display: none; }
+        .seat-row { display: flex; justify-content: center; margin-bottom: 8px; }
+        .seat { width: 40px; height: 40px; margin: 3px; background: #d0e4ff; border-radius: 6px; cursor: pointer; display: flex; justify-content: center; align-items: center; font-weight: bold; transition: 0.2s; }
+        .seat.selected { background: #1d70ff; color: white; }
+        .seat.booked { background: #aaa; cursor: not-allowed; }
+        button { width: 100%; margin-top: 20px; padding: 14px; background: #1d70ff; color: white; font-weight: bold; border: none; border-radius: 12px; cursor: pointer; font-size: 17px; transition: 0.25s; }
+        button:hover { background: #1557d6; }
+        @media (max-width: 600px) { .flight-card, .meal-card { width: 48%; } }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Flight Booking</h2>
+
+    <!-- Selected Flight -->
+    <div class="selected-flight" id="selectedFlightDiv">
+        <h3>Selected Flight</h3>
+        <p><strong>From:</strong> <span id="selFrom"></span></p>
+        <p><strong>To:</strong> <span id="selTo"></span></p>
+        <p><strong>Departure:</strong> <span id="selDep"></span></p>
+        <p><strong>Price:</strong> <span id="selPrice"></span> EGP</p>
+    </div>
+
+    <!-- Flight Cards -->
+    <div class="cards-container" id="flightCards">
+        <div class="flight-card" data-flight='{"from":"Cairo","to":"Dubai","departure":"10:30 AM","price":6500,"flightNumber":"AW001"}'>
+            <h3>Cairo → Dubai</h3><p>Departure: 10:30 AM</p><p>Price: 6500 EGP</p>
+        </div>
+        <div class="flight-card" data-flight='{"from":"Cairo","to":"Riyadh","departure":"01:00 PM","price":4800,"flightNumber":"AW002"}'>
+            <h3>Cairo → Riyadh</h3><p>Departure: 01:00 PM</p><p>Price: 4800 EGP</p>
+        </div>
+        <div class="flight-card" data-flight='{"from":"Cairo","to":"London","departure":"09:15 AM","price":12500,"flightNumber":"AW003"}'>
+            <h3>Cairo → London</h3><p>Departure: 09:15 AM</p><p>Price: 12500 EGP</p>
+        </div>
+    </div>
+
+    <!-- Seats -->
+    <label>Select Seat:</label>
+    <div class="seats-container" id="seatsContainer"></div>
+
+    <!-- Meals -->
+    <label>Select Meal:</label>
+    <div class="meals" id="mealsContainer">
+        <div class="meal-card" data-meal="Chicken"><img src="chicken.png" alt="Chicken"><input type="radio" name="meal"><p>Chicken</p></div>
+        <div class="meal-card" data-meal="Beef"><img src="beef.png" alt="Beef"><input type="radio" name="meal"><p>Beef</p></div>
+        <div class="meal-card" data-meal="Vegetarian"><img src="vegetarian.png" alt="Vegetarian"><input type="radio" name="meal"><p>Vegetarian</p></div>
+        <div class="meal-card" data-meal="Vegan"><img src="vegan.png" alt="Vegan"><input type="radio" name="meal"><p>Vegan</p></div>
+    </div>
+
+    <button onclick="goNext()">Next → Passenger Info</button>
+</div>
+
+<script>
+    let selectedFlight = null;
+    const flightCards = document.querySelectorAll('.flight-card');
+    const selectedFlightDiv = document.getElementById('selectedFlightDiv');
+    const seatsContainer = document.getElementById('seatsContainer');
+    const mealsContainer = document.getElementById('mealsContainer');
+
+    // ===== Flight Selection =====
+    flightCards.forEach(card=>{
+        card.addEventListener('click',()=>{
+            flightCards.forEach(c=>c.classList.remove('selected'));
+            card.classList.add('selected');
+            selectedFlight = JSON.parse(card.dataset.flight);
+            document.getElementById('selFrom').textContent = selectedFlight.from;
+            document.getElementById('selTo').textContent = selectedFlight.to;
+            document.getElementById('selDep').textContent = selectedFlight.departure;
+            document.getElementById('selPrice').textContent = selectedFlight.price;
+            selectedFlightDiv.style.display = 'block';
+
+            // Show seats
+            seatsContainer.style.display = 'block';
+            mealsContainer.style.display = 'none';
+        });
+    });
+
+    // ===== Seats Grid =====
+    const rows=6, cols=6, bookedSeats=['12B','14C'];
+    let selectedSeat='';
+    for(let r=1;r<=rows;r++){
+        const rowDiv=document.createElement('div');
+        rowDiv.classList.add('seat-row');
+        for(let c=0;c<cols;c++){
+            const seatLabel=String.fromCharCode(65+c);
+            const seatNumber=r+seatLabel;
+            const seatDiv=document.createElement('div');
+            seatDiv.classList.add('seat');
+            seatDiv.textContent=seatLabel;
+            seatDiv.dataset.seat=seatNumber;
+            if(bookedSeats.includes(seatNumber)) seatDiv.classList.add('booked');
+            else seatDiv.addEventListener('click',()=>{
+                document.querySelectorAll('.seat').forEach(s=>s.classList.remove('selected'));
+                seatDiv.classList.add('selected');
+                selectedSeat=seatNumber;
+                mealsContainer.style.display='flex';
+            });
+            rowDiv.appendChild(seatDiv);
+        }
+        seatsContainer.appendChild(rowDiv);
+    }
+
+    // ===== Meals Selection =====
+    const mealCards=document.querySelectorAll('.meal-card');
+    let selectedMeal='';
+    mealCards.forEach(card=>{
+        card.addEventListener('click',()=>{
+            mealCards.forEach(c=>c.classList.remove('selected'));
+            card.classList.add('selected');
+            card.querySelector('input').checked=true;
+            selectedMeal=card.dataset.meal;
+        });
+    });
+
+    // ===== Next Button =====
+    function goNext(){
+        if(!selectedFlight){ alert('Please select a flight.'); return; }
+        if(selectedSeat===''){ alert('Please select a seat.'); return; }
+        if(selectedMeal===''){ alert('Please select a meal.'); return; }
+
+        const bookingData={ flight:selectedFlight, seat:selectedSeat, meal:selectedMeal };
+        localStorage.setItem('booking', JSON.stringify(bookingData));
+        window.location.href='passenger.html';
+    }
+</script>
+</body>
+</html>
